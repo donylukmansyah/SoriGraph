@@ -1,0 +1,9 @@
+{
+  "name": "sorigraph",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A neon-green cubic-bezier easing CEP panel for Adobe After Effects (SoriGraph).",
+  "dependencies": {
+    "sweetalert2": "^11.4.8"
+  }
+}

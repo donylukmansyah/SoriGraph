@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ExtensionManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  Version="6.0"
+  ExtensionBundleId="com.sori.flow"
+  ExtensionBundleVersion="1.0.0"
+  ExtensionBundleName="SoriGraph">
+
+  <ExtensionList>
+    <Extension Id="com.sori.flow.panel" Version="1.0.0"/>
+  </ExtensionList>
+
+  <ExecutionEnvironment>
+    <HostList>
+      <!-- AE 2019 v16.0 = CEP 9 (Chromium 61) -->
+      <!-- AE 2020 v17.0 = CEP 9 (Chromium 61) -->
+      <!-- AE 2020 v17.5 = CEP 10 (Chromium 74) -->
+      <!-- AE 2022+ = CEP 11 (Chromium 88+) -->
+      <Host Name="AEFT" Version="[16.0,99.9]"/>
+    </HostList>
+    <LocaleList>
+      <Locale Code="All"/>
+    </LocaleList>
+    <RequiredRuntimeList>
+      <RequiredRuntime Name="CSXS" Version="6.0"/>
+    </RequiredRuntimeList>
+  </ExecutionEnvironment>
+
+  <DispatchInfoList>
+    <Extension Id="com.sori.flow.panel">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./panel/index.html</MainPath>
+          <ScriptPath>./panel/jsx/main.jsx</ScriptPath>
+          <CEFCommandLine>
+            <Parameter>--enable-nodejs</Parameter>
+            <Parameter>--allow-file-access-from-files</Parameter>
+            <Parameter>--allow-file-access</Parameter>
+            <Parameter>--mixed-context</Parameter>
+          </CEFCommandLine>
+        </Resources>
+        <Lifecycle>
+          <AutoVisible>true</AutoVisible>
+        </Lifecycle>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>SoriGraph</Menu>
+          <Geometry>
+            <Size>
+              <Height>720</Height>
+              <Width>320</Width>
+            </Size>
+            <MinSize>
+              <Height>360</Height>
+              <Width>220</Width>
+            </MinSize>
+          </Geometry>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+  </DispatchInfoList>
+</ExtensionManifest>
