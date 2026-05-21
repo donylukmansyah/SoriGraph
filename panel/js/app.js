@@ -1076,8 +1076,6 @@
     els.snapHandle2.style.display = "none";
 
     var active = graph.drag && graph.drag.index === 0 ? p1 : p2;
-    els.snapBadge.style.left = active.x + "px";
-    els.snapBadge.style.top = active.y + "px";
 
     if (graph.drag) {
       els.snapBadge.textContent = "snap";
@@ -1090,29 +1088,15 @@
     var rect = graph.rect || els.graphStage.getBoundingClientRect();
     var stageWidth = rect.width || els.graphStage.offsetWidth || 1;
     var stageHeight = rect.height || els.graphStage.offsetHeight || 1;
-    var distances = {
-      top: active.y,
-      right: stageWidth - active.x,
-      bottom: stageHeight - active.y,
-      left: active.x
-    };
-    var nearest = "top";
-    var nearestDistance = distances.top;
+    var badgeHeight = els.snapBadge.offsetHeight || 20;
+    var edgeGap = Math.max(8, Math.round(10 * (parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--graph-scale")) || 1)));
+    var top = clamp(active.y, edgeGap + badgeHeight / 2, stageHeight - edgeGap - badgeHeight / 2);
+    var placeLeft = active.x > stageWidth * 0.62;
 
-    if (distances.right < nearestDistance) {
-      nearest = "right";
-      nearestDistance = distances.right;
-    }
-    if (distances.bottom < nearestDistance) {
-      nearest = "bottom";
-      nearestDistance = distances.bottom;
-    }
-    if (distances.left < nearestDistance) {
-      nearest = "left";
-    }
-
-    els.snapBadge.classList.remove("snap-top", "snap-right", "snap-bottom", "snap-left");
-    els.snapBadge.classList.add("snap-" + nearest);
+    els.snapBadge.style.left = active.x + "px";
+    els.snapBadge.style.top = top + "px";
+    els.snapBadge.classList.remove("snap-side-right", "snap-side-left");
+    els.snapBadge.classList.add(placeLeft ? "snap-side-left" : "snap-side-right");
   }
 
   function curveToScreen(point) {
