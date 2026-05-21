@@ -321,17 +321,18 @@ body.legacy-cep .title-actions > * + * {
   display: none;
   padding: 3px 8px;
   --snap-badge-gap: calc(10px * var(--graph-scale, 1));
+  --snap-badge-y-offset: calc(22px * var(--graph-scale, 1));
   border-radius: 999px;
   background: var(--accent);
   color: white; font-size: 10px; font-weight: 600;
   white-space: nowrap; pointer-events: none;
-  transform: translate(var(--snap-badge-gap), -50%);
+  transform: translate(var(--snap-badge-gap), calc(-1 * var(--snap-badge-y-offset)));
   transition: transform 120ms ease;
   box-shadow: 0 4px 12px rgba(122, 67, 245, 0.3);
 }
 
-.snap-badge.snap-side-right { transform: translate(var(--snap-badge-gap), -50%); }
-.snap-badge.snap-side-left { transform: translate(calc(-100% - var(--snap-badge-gap)), -50%); }
+.snap-badge.snap-side-right { transform: translate(var(--snap-badge-gap), calc(-1 * var(--snap-badge-y-offset))); }
+.snap-badge.snap-side-left { transform: translate(calc(-100% - var(--snap-badge-gap)), calc(-1 * var(--snap-badge-y-offset))); }
 .snap-badge.visible { display: block; }
 
 .snap-handle {
