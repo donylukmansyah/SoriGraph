@@ -1083,8 +1083,36 @@
       els.snapBadge.textContent = "snap";
     }
 
-    var stageWidth = graph.rect ? graph.rect.width : els.graphStage.offsetWidth;
-    els.snapBadge.classList.toggle("flip-left", active.x > stageWidth * 0.6);
+    positionSnapBadge(active);
+  }
+
+  function positionSnapBadge(active) {
+    var rect = graph.rect || els.graphStage.getBoundingClientRect();
+    var stageWidth = rect.width || els.graphStage.offsetWidth || 1;
+    var stageHeight = rect.height || els.graphStage.offsetHeight || 1;
+    var distances = {
+      top: active.y,
+      right: stageWidth - active.x,
+      bottom: stageHeight - active.y,
+      left: active.x
+    };
+    var nearest = "top";
+    var nearestDistance = distances.top;
+
+    if (distances.right < nearestDistance) {
+      nearest = "right";
+      nearestDistance = distances.right;
+    }
+    if (distances.bottom < nearestDistance) {
+      nearest = "bottom";
+      nearestDistance = distances.bottom;
+    }
+    if (distances.left < nearestDistance) {
+      nearest = "left";
+    }
+
+    els.snapBadge.classList.remove("snap-top", "snap-right", "snap-bottom", "snap-left");
+    els.snapBadge.classList.add("snap-" + nearest);
   }
 
   function curveToScreen(point) {

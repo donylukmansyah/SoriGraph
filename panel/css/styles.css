@@ -320,16 +320,20 @@ body.legacy-cep .title-actions > * + * {
   position: absolute; z-index: 5;
   display: none;
   padding: 3px 8px;
+  --snap-badge-gap: calc(10px * var(--graph-scale, 1));
   border-radius: 999px;
   background: var(--accent);
   color: white; font-size: 10px; font-weight: 600;
   white-space: nowrap; pointer-events: none;
-  transform: translate(10px, -22px);
+  transform: translate(-50%, calc(-100% - var(--snap-badge-gap)));
   transition: transform 120ms ease;
   box-shadow: 0 4px 12px rgba(122, 67, 245, 0.3);
 }
 
-.snap-badge.flip-left { transform: translate(calc(-100% - 10px), -22px); }
+.snap-badge.snap-top { transform: translate(-50%, var(--snap-badge-gap)); }
+.snap-badge.snap-right { transform: translate(calc(-100% - var(--snap-badge-gap)), -50%); }
+.snap-badge.snap-bottom { transform: translate(-50%, calc(-100% - var(--snap-badge-gap))); }
+.snap-badge.snap-left { transform: translate(var(--snap-badge-gap), -50%); }
 .snap-badge.visible { display: block; }
 
 .snap-handle {
