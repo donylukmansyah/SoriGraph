@@ -216,6 +216,14 @@ body.legacy-cep .title-actions > * + * {
   margin-left: calc(8px * var(--graph-scale, 1));
 }
 
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .brand-logo {
   height: calc(20px * var(--graph-scale, 1));
   max-height: calc(20px * var(--graph-scale, 1));
@@ -424,6 +432,11 @@ body.legacy-cep .controls-container > * + * {
 
 .controls-container .icon-button:active {
   transform: scale(0.92);
+}
+
+/* Hide save preset button when panel width is too narrow */
+.controls-container.mini-controls #saveBtn {
+  display: none !important;
 }
 
 /* ── Splitter (Premium Drag Handle) ── */

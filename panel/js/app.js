@@ -114,6 +114,7 @@
 
   function cacheElements() {
     els.appShell = document.querySelector(".app-shell");
+    els.brandLink = document.getElementById("brandLink");
     els.graphPane = document.getElementById("graphPane");
     els.libraryPane = document.getElementById("libraryPane");
     els.graphStage = document.getElementById("graphStage");
@@ -206,6 +207,9 @@
         document.body.classList.add("using-keyboard");
       }
     });
+    if (els.brandLink) {
+      els.brandLink.addEventListener("click", openBrandSite);
+    }
     els.graphStage.addEventListener("mousedown", stageMouseDown);
     els.handle1.addEventListener("mousedown", handleMouseDown);
     els.handle2.addEventListener("mousedown", handleMouseDown);
@@ -325,6 +329,20 @@
 
     addWheelFallback(scrollTarget);
     addWheelFallback(els.libraryPane);
+  }
+
+  function openBrandSite(event) {
+    var url = "https://www.soriscp.com/";
+    if (event) {
+      event.preventDefault();
+    }
+    try {
+      if (window.cep && window.cep.util && window.cep.util.openURLInDefaultBrowser) {
+        window.cep.util.openURLInDefaultBrowser(url);
+        return;
+      }
+    } catch (error) {}
+    window.open(url, "_blank");
   }
 
   function isPresetZoomWheel(event) {
@@ -899,6 +917,10 @@
     applyPresetScale();
 
     els.graphPane.classList.toggle("graph-collapsed", collapsed);
+
+    if (els.controlsContainer) {
+      els.controlsContainer.classList.toggle("mini-controls", paneRect.width < 225);
+    }
 
     if (els.appShell) {
       els.appShell.classList.toggle("controls-docked", collapsed);

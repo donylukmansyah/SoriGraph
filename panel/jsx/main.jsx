@@ -61,12 +61,21 @@ SORI.getActiveComp = function () {
 
 // Build a unique string key for a property to detect duplicates.
 // Uses the property's matchName chain up through parents for uniqueness.
+// Layer-level objects are identified by their comp index to prevent
+// cross-layer deduplication (e.g. AVLayer types share matchName "ADBE AV Layer").
 SORI.propertyKey = function (property) {
   var key = "";
   try {
     var p = property;
     while (p) {
-      key = (p.matchName || p.name || "") + "/" + key;
+      // Detect Layer-level objects (top of hierarchy): they have an index
+      // property and their parentProperty is null. Use "L{index}" to ensure
+      // properties on different layers are never treated as duplicates.
+      if (typeof p.index === "number" && !p.parentProperty) {
+        key = "L" + p.index + "/" + key;
+      } else {
+        key = (p.matchName || p.name || "") + "/" + key;
+      }
       p = p.parentProperty || null;
     }
   } catch (e) {}
@@ -83,11 +92,26 @@ SORI.collectSelectedKeyedProperties = function () {
 
   var result = [];
   var seen = {};
-  var selected = comp.selectedProperties;
 
-  for (var i = 0; i < selected.length; i += 1) {
-    SORI.collectProperty(selected[i], result, seen);
-  }
+  // 1. Collect from timeline-selected properties directly
+  try {
+    var selected = comp.selectedProperties;
+    if (selected) {
+      for (var i = 0; i < selected.length; i += 1) {
+        SORI.collectProperty(selected[i], result, seen);
+      }
+    }
+  } catch (e) {}
+
+  // 2. Also collect from all selected layers to scan deeply nested/custom properties (Effects, Shapes, Time Remapping, etc.)
+  try {
+    var selectedLayers = comp.selectedLayers;
+    if (selectedLayers) {
+      for (var i = 0; i < selectedLayers.length; i += 1) {
+        SORI.collectProperty(selectedLayers[i], result, seen);
+      }
+    }
+  } catch (e) {}
 
   if (result.length === 0) {
     return {
@@ -106,30 +130,45 @@ SORI.collectProperty = function (property, result, seen) {
   }
 
   try {
+    // 1. Handle separation leader (e.g. separated Position)
     if (property.isSeparationLeader && property.dimensionsSeparated && property.numProperties) {
       for (var childIndex = 1; childIndex <= property.numProperties; childIndex += 1) {
-        SORI.collectProperty(property.property(childIndex), result, seen);
+        try {
+          var child = property.property(childIndex);
+          if (child) {
+            SORI.collectProperty(child, result, seen);
+          }
+        } catch (e) {}
       }
       return;
     }
-  } catch (e) {}
 
-  if (SORI.keyframesCanBeModified(property) && property.selectedKeys && property.selectedKeys.length > 0) {
-    var key = SORI.propertyKey(property);
-    if (!seen[key]) {
-      seen[key] = true;
-      result.push({
-        property: property,
-        keys: property.selectedKeys
-      });
+    // 2. Collect keyframed property if it has selected keyframes
+    if (SORI.keyframesCanBeModified(property) && property.selectedKeys && property.selectedKeys.length > 0) {
+      var key = SORI.propertyKey(property);
+      if (!seen[key]) {
+        seen[key] = true;
+        result.push({
+          property: property,
+          keys: property.selectedKeys
+        });
+      }
+      return;
     }
-    return;
-  }
 
-  if (property.numProperties) {
-    for (var i = 1; i <= property.numProperties; i += 1) {
-      SORI.collectProperty(property.property(i), result, seen);
+    // 3. Recursively traverse all sub-properties and groups (Effects, Shapes, etc.) with try-catch safety
+    if (property.numProperties) {
+      for (var i = 1; i <= property.numProperties; i += 1) {
+        try {
+          var child = property.property(i);
+          if (child) {
+            SORI.collectProperty(child, result, seen);
+          }
+        } catch (e) {}
+      }
     }
+  } catch (err) {
+    // Gracefully handle any unexpected property errors to avoid aborting the traversal
   }
 };
 
