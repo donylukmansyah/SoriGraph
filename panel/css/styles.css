@@ -1006,6 +1006,21 @@ body.legacy-cep .toolbar-actions > * + * {
   font-size: 12px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
   padding: 10px 16px;
+  cursor: grab;
+  touch-action: none;
+  will-change: transform, opacity;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.swal2-popup.sori-toast.is-dragging,
+.swal2-popup.sorigraph-toast.is-dragging {
+  cursor: grabbing;
+}
+
+.swal2-popup.sori-toast.is-dismissing,
+.swal2-popup.sorigraph-toast.is-dismissing {
+  pointer-events: none;
 }
 
 .swal2-popup.sori-toast .swal2-title,

@@ -2631,8 +2631,139 @@
       timerProgressBar: true,
       customClass: {
         popup: "sorigraph-toast"
+      },
+      didOpen: function (toastElement) {
+        enableSwipeDismissToast(toastElement);
       }
     });
+  }
+
+  function enableSwipeDismissToast(toastElement) {
+    if (!toastElement) {
+      return;
+    }
+
+    var startX = 0;
+    var startY = 0;
+    var lastX = 0;
+    var lastY = 0;
+    var startTime = 0;
+    var dragging = false;
+    var dismissing = false;
+    var threshold = 72;
+
+    function point(event) {
+      var touch = event.touches && event.touches[0] ? event.touches[0] : null;
+      var changed = event.changedTouches && event.changedTouches[0] ? event.changedTouches[0] : null;
+      return touch || changed || event;
+    }
+
+    function start(event) {
+      if (event.button && event.button !== 0) {
+        return;
+      }
+      var p = point(event);
+      startX = lastX = p.clientX;
+      startY = lastY = p.clientY;
+      startTime = Date.now();
+      dragging = true;
+      dismissing = false;
+      threshold = Math.max(56, Math.min(toastElement.offsetWidth || 240, 260) * 0.28);
+      toastElement.classList.add("is-dragging");
+      toastElement.style.transition = "none";
+      try {
+        if (Swal.stopTimer) {
+          Swal.stopTimer();
+        }
+      } catch (error) {}
+
+      document.addEventListener("mousemove", move, false);
+      document.addEventListener("mouseup", end, false);
+      document.addEventListener("touchmove", move, false);
+      document.addEventListener("touchend", end, false);
+      document.addEventListener("touchcancel", end, false);
+    }
+
+    function move(event) {
+      if (!dragging || dismissing) {
+        return;
+      }
+      var p = point(event);
+      lastX = p.clientX;
+      lastY = p.clientY;
+      var dx = lastX - startX;
+      var dy = lastY - startY;
+      var distance = Math.sqrt(dx * dx + dy * dy);
+      var opacity = Math.max(0.28, 1 - distance / 220);
+      var rotate = Math.max(-7, Math.min(7, dx / 22));
+      toastElement.style.transform = "translate3d(" + dx + "px," + dy + "px,0) rotate(" + rotate + "deg)";
+      toastElement.style.opacity = opacity;
+      if (event.cancelable !== false) {
+        event.preventDefault();
+      }
+    }
+
+    function end() {
+      if (!dragging) {
+        return;
+      }
+      dragging = false;
+      removeDragListeners();
+
+      var dx = lastX - startX;
+      var dy = lastY - startY;
+      var distance = Math.sqrt(dx * dx + dy * dy);
+      var elapsed = Math.max(Date.now() - startTime, 1);
+      var velocity = distance / elapsed;
+
+      if (distance > threshold || velocity > 0.75) {
+        dismissToast(dx, dy, distance);
+        return;
+      }
+
+      toastElement.classList.remove("is-dragging");
+      toastElement.style.transition = "transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 160ms ease";
+      toastElement.style.transform = "";
+      toastElement.style.opacity = "";
+      try {
+        if (Swal.resumeTimer) {
+          Swal.resumeTimer();
+        }
+      } catch (error) {}
+    }
+
+    function dismissToast(dx, dy, distance) {
+      dismissing = true;
+      toastElement.classList.remove("is-dragging");
+      toastElement.classList.add("is-dismissing");
+      if (!distance) {
+        dx = 0;
+        dy = -1;
+        distance = 1;
+      }
+      var travel = Math.max(window.innerWidth || 320, window.innerHeight || 320);
+      var exitX = dx / distance * travel;
+      var exitY = dy / distance * travel;
+      toastElement.style.transition = "transform 180ms cubic-bezier(0.4, 0, 1, 1), opacity 140ms ease";
+      toastElement.style.transform = "translate3d(" + exitX + "px," + exitY + "px,0) scale(0.96)";
+      toastElement.style.opacity = "0";
+      window.setTimeout(function () {
+        if (Swal.isVisible && Swal.isVisible()) {
+          Swal.close();
+        }
+      }, 150);
+    }
+
+    function removeDragListeners() {
+      document.removeEventListener("mousemove", move, false);
+      document.removeEventListener("mouseup", end, false);
+      document.removeEventListener("touchmove", move, false);
+      document.removeEventListener("touchend", end, false);
+      document.removeEventListener("touchcancel", end, false);
+    }
+
+    toastElement.addEventListener("mousedown", start, false);
+    toastElement.addEventListener("touchstart", start, false);
   }
 
   function promptSeparateDimensions(retryCallback) {
