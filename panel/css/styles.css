@@ -320,8 +320,8 @@ body.legacy-cep .title-actions > * + * {
   position: absolute; z-index: 5;
   display: none;
   padding: 3px 8px;
-  --snap-badge-gap: calc(10px * var(--graph-scale, 1));
-  --snap-badge-y-offset: calc(22px * var(--graph-scale, 1));
+  --snap-badge-gap: 10px;
+  --snap-badge-y-offset: 22px;
   border-radius: 999px;
   background: var(--accent);
   color: white; font-size: 10px; font-weight: 600;

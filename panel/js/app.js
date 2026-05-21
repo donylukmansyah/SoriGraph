@@ -1088,10 +1088,9 @@
     var rect = graph.rect || els.graphStage.getBoundingClientRect();
     var stageWidth = rect.width || els.graphStage.offsetWidth || 1;
     var stageHeight = rect.height || els.graphStage.offsetHeight || 1;
-    var graphScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--graph-scale")) || 1;
     var badgeHeight = els.snapBadge.offsetHeight || 20;
-    var edgeGap = Math.max(8, Math.round(10 * graphScale));
-    var yOffset = Math.round(22 * graphScale);
+    var edgeGap = 10;
+    var yOffset = 22;
     var top = clamp(active.y, edgeGap + yOffset, stageHeight - edgeGap + yOffset - badgeHeight);
     var placeLeft = active.x > stageWidth * 0.62;
 
